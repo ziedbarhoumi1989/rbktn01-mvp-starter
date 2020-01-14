@@ -14,16 +14,18 @@ class First extends React.Component {
       newAge: "",
       newEmail: "",
       newPassword: "",
+      newPassword2: "",
       redirect: false
     };
+
     this.handleChange = this.handleChange.bind(this);
   }
   handleChange(e) {
-    const target = e.target;
-    const value = target.value;
-    const name = target.name;
+    // const target = e.target;
+    // const value = target.value;
+    // const name = target.name;
     this.setState({
-      [name]: value
+      [e.target.name]: e.target.value
     });
     console.log(this.state);
   }
@@ -31,26 +33,57 @@ class First extends React.Component {
     event.preventDefault();
     this.setState({ redirect: !this.state.redirect });
     axios
-      .post("/user", this.state)
-      .then(function(response) {
+      .post("/api/usersignin", this.state)
+      .then(function (response) {
         console.log(response);
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
       });
+    // this.setState({
+    //   username: "",
+    //   password: "",
+    //   newUser: "",
+    //   newAge: "",
+    //   newEmail: "",
+    //   newPassword: "",
+    //   newPassword2: "",
+    // });
+  }
+  handleRegister(event) {
+    event.preventDefault();
+    this.setState({ redirect: !this.state.redirect });
+    axios
+      .post("/api/usersignup", this.state)
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    this.setState({
+      username: "",
+      password: "",
+      newUser: "",
+      newAge: "",
+      newEmail: "",
+      newPassword: "",
+      newPassword2: "",
+    });
   }
   render() {
-    if (this.state.redirect) return <Redirect to="hello" />;
+    if (this.state.redirect) return <Redirect to="user" />;
     var inputStyle = { width: "200px", height: "30px" };
 
-    const {
-      username,
-      password,
-      newUser,
-      newAge,
-      newEmail,
-      newPassword
-    } = this.state;
+    // const {
+    //   username,
+    //   password,
+    //   newUser,
+    //   newAge,
+    //   newEmail,
+    //   newPassword,
+    //   newPassword2
+    // } = this.state;
     return (
       <div>
         <div id="signin" style={{ height: "40%", marginTop: "0" }}>
@@ -65,15 +98,15 @@ class First extends React.Component {
             <form onSubmit={this.handleSignin.bind(this)}>
               <input
                 type="text"
-                value={username}
+                value={this.state.username}
                 name="username"
                 placeholder="enter username"
-                onChange={this.handleChange}
+                onChange={this.handleChange.bind(this)}
                 required
               ></input>
               <input
-                type="text"
-                value={password}
+                type="password"
+                value={this.state.password}
                 name="password"
                 placeholder="enter password"
                 onChange={this.handleChange.bind(this)}
@@ -96,7 +129,7 @@ class First extends React.Component {
               ")"
           }}
         >
-          <form>
+          <form onSubmit={this.handleRegister.bind(this)}>
             <label>
               {" "}
               Username:<br></br>
@@ -104,7 +137,7 @@ class First extends React.Component {
                 type="text"
                 style={inputStyle}
                 name="newUser"
-                value={newUser}
+                value={this.state.newUser}
                 onChange={this.handleChange.bind(this)}
                 required
               ></input>
@@ -118,7 +151,7 @@ class First extends React.Component {
                 min="10"
                 max="120"
                 style={inputStyle}
-                value={newAge}
+                value={this.state.newAge}
                 name="newAge"
                 onChange={this.handleChange.bind(this)}
                 required
@@ -131,9 +164,9 @@ class First extends React.Component {
               <input
                 type="email"
                 style={inputStyle}
-                value={newEmail}
+                value={this.state.newEmail}
                 onChange={this.handleChange.bind(this)}
-                name="newAge"
+                name="newEmail"
                 required
               ></input>
             </label>
@@ -142,16 +175,29 @@ class First extends React.Component {
               {" "}
               password:<br></br>
               <input
-                type="text"
+                type="password"
                 style={inputStyle}
-                value={newPassword}
+                value={this.state.newPassword}
                 onChange={this.handleChange.bind(this)}
                 name="newPassword"
                 required
               ></input>
             </label>
             <br></br>
-            <input type="submit" value="register" required></input>
+            <label>
+              {" "}
+              Confirm password:<br></br>
+              <input
+                type="password"
+                style={inputStyle}
+                value={this.state.newPassword2}
+                onChange={this.handleChange.bind(this)}
+                name="newPassword2"
+                required
+              ></input>
+            </label>
+            <br></br>
+            <input type="submit" value="register" ></input>
           </form>
         </div>
       </div>

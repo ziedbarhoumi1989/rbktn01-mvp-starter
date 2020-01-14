@@ -1,54 +1,115 @@
 var express = require("express");
 var path = require("path");
 var bodyParser = require("body-parser");
+var bcrypt = require('bcryptjs')
+var jwt = require('jsonwebtoken')
 
-// UNCOMMENT THE DATABASE YOU'D LIKE TO USE
-// var items = require('../database-mysql');
 var items = require("../database-mongo");
-
+var Users = require("../database-mongo/models/user.js");
+var posts = require("../database-mongo/models/posts.js");
+var signUpValidator = require('./validation/signupValidation')
+var signInValidator = require('./validation/signinValidation')
 var app = express();
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
 app.use(bodyParser.json());
-// ADDED FOR TESTING
-//app.set("views", __dirname + "../react-client/src");
-//app.set("view engine", "ejs");
+// app.get("/", (req, res) => {
+//   console.log("here");
+//   console.log('the user collection \n', Users)
+//   res.redirect("/signin");
 
-// UNCOMMENT FOR REACT
-
-// UNCOMMENT FOR ANGULAR
-// app.use(express.static(__dirname + '/../angular-client'));
-// app.use(express.static(__dirname + '/../node_modules'));
-app.get("/", (req, res) => {
-  console.log("here");
-  res.redirect("/signin");
-  next();
-});
+// });
 app.use(express.static(__dirname + "/../react-client/dist"));
+app.get("/", (req, res) => {
+  console.log("the users are", users);
+  console.log('the user collection \n', Users)
+  res.redirect("/signin");
+
+});
 
 app.get("/signin", (req, res) => {
   res.sendFile(path.join(__dirname, "../react-client/dist/index.html"));
 });
 app.post("/user", (req, res) => {
-  console.log(req.body);
-  res.send(req.body);
+  res.send('request handled')
 });
-app.get("/user", (req, res) => {
-  console.log(req.body);
-  res.sendFile(path.join(__dirname, "../react-client/dist/index.html"));
-});
-app.get("/items", function(req, res) {
-  items.selectAll(function(err, data) {
+app.post("/api/usersignup", (req, res) => {
+  var { errors, isValid } = signUpValidator(req.body);
+  if (!isValid) {
+    res.status(400).json(errors)
+  }
+  Users.selectOne({ username: req.body.newUser }, (err, data) => {
+    console.log(req.body)
     if (err) {
-      res.sendStatus(500);
-    } else {
-      res.json(data);
-    }
-  });
-});
+      var hash = bcrypt.hashSync(req.body.newPassword, 8);
+      let newUser = { username: req.body.newUser, password: hash };
 
-app.listen(3000, function() {
+      console.log('this is ', Users)
+
+      Users.save(newUser, (err, result) => {
+        if (err) {
+          console.log(err)
+        }
+        else console.log('user added successfully')
+      })
+
+    }
+    else console.log('user already exists')
+  })
+
+})
+app.post("/api/usersignin", (req, res) => {
+  var { errors, isValid } = signInValidator(req.body);
+  if (!isValid) {
+    res.status(400).json(errors)
+  }
+  else
+    Users.selectOne({ username: req.body.username }, (err, data) => {
+      if (err) {
+        res.status(400).json('user not found')
+
+      } else {
+        // Check password
+        password = req.body.password
+        bcrypt.compare(password, user.password).then(isMatch => {
+          if (isMatch) {
+            // User matched
+            // Create JWT Payload
+            const payload = {
+              id: user.id,
+              name: user.name
+            };
+            // Sign token
+            jwt.sign(
+              payload,
+              keys.secretOrKey,
+              {
+                expiresIn: 3600 // 1 hourin seconds
+              },
+              (err, token) => {
+                res.json({
+                  success: true,
+                  token: "Bearer " + token
+                });
+              }
+            );
+          } else {
+            return res
+              .status(400)
+              .json({ passwordincorrect: "Password incorrect" });
+          }
+        });
+      }
+
+
+    })
+
+})
+
+app.use(express.static(__dirname + "/../react-client/dist"));
+
+app.listen(3000, function () {
   console.log("listening on port 3000!");
 });
