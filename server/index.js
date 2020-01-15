@@ -43,8 +43,11 @@ app.post("/api/usersignup", (req, res) => {
   Users.selectOne({ username: req.body.newUser }, (err, data) => {
     console.log(req.body)
     if (err) {
+      console.log(err)
+    }
+    else if (!data) {
       var hash = bcrypt.hashSync(req.body.newPassword, 8);
-      let newUser = { username: req.body.newUser, password: hash };
+      var newUser = { username: req.body.newUser, password: hash };
 
       console.log('this is ', Users)
 
@@ -54,8 +57,9 @@ app.post("/api/usersignup", (req, res) => {
         }
         else console.log('user added successfully')
       })
-
     }
+
+
     else console.log('user already exists')
   })
 
@@ -65,26 +69,29 @@ app.post("/api/usersignin", (req, res) => {
   if (!isValid) {
     res.status(400).json(errors)
   }
-  else
+  else {
     Users.selectOne({ username: req.body.username }, (err, data) => {
       if (err) {
-        res.status(400).json('user not found')
+        console.log(err)
 
-      } else {
+      } else if (!data) {
+        res.status(400).json('user not found')
+      }
+      else {
         // Check password
         password = req.body.password
-        bcrypt.compare(password, user.password).then(isMatch => {
+        bcrypt.compare(password, data.password).then(isMatch => {
           if (isMatch) {
             // User matched
             // Create JWT Payload
             const payload = {
-              id: user.id,
-              name: user.name
+              id: data.id,
+              name: data.username
             };
             // Sign token
             jwt.sign(
               payload,
-              keys.secretOrKey,
+              'this is a secret',
               {
                 expiresIn: 3600 // 1 hourin seconds
               },
@@ -105,6 +112,7 @@ app.post("/api/usersignin", (req, res) => {
 
 
     })
+  }
 
 })
 

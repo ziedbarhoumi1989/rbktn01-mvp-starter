@@ -4,7 +4,11 @@ const db = require('../index.js');
 let UserSchema = mongoose.Schema({
   username: { type: String, unique: true },
   password: String,
-  Friends: String
+  age: Number,
+  Email: String,
+
+  Friends: [Object],
+
 })
 
 

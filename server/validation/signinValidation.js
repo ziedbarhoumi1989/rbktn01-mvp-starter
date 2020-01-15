@@ -2,13 +2,13 @@ var validator = require('validator');
 var isEmpty = require('is-empty');
 function signInInputValidation(data) {
   var errors = {};
-  data.newuser = isEmpty(data.newuser) ? '' : data.newuser;
-  data.newPassword = isEmpty(data.newPassword) ? '' : data.newPassword;
+  data.username = isEmpty(data.username) ? '' : data.username;
+  data.password = isEmpty(data.password) ? '' : data.password;
   if (validator.isEmpty(data.username)) {
-    errors.newuser = 'enter a valid userName'
+    errors.username = 'enter a valid userName'
   }
-  if (validator.isEmpty(data.newPassword)) {
-    errors.newPassword = 'enter your password What the hell'
+  if (validator.isEmpty(data.password)) {
+    errors.password = 'enter your password What the hell'
   }
   return {
     errors: errors,
