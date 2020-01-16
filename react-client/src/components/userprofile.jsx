@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
+//import Webcam from "react-webcam";
+import ImageUploader from 'react-images-upload';
 import $ from "jquery";
 import axios from "axios";
 import '../styles/assets/css/bootstrap.css'
@@ -19,15 +21,17 @@ class profile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      password: "",
-      newUser: "",
-      newAge: "",
-      newEmail: "",
-      newPassword: "",
-      redirect: false
+      srchTerm: '',
+      friends: [],
+      imageClicked: false,
+      redirectedToHome: false
     };
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClick = this.handleClick.bind(this)
+  }
+  handleClick() {
+    this.setState({ imageClicked: true })
   }
   handleChange(e) {
     const target = e.target;
@@ -38,11 +42,15 @@ class profile extends React.Component {
     });
     console.log(this.state);
   }
-  handleSignin(event) {
+  handleDisconnect() {
+    localStorage.removeItem('user')
+    this.setState({ redirectedToHome: true })
+  }
+  handleSubmit(event) {
     event.preventDefault();
     this.setState({ redirect: !this.state.redirect });
     axios
-      .post("/api/user", this.state)
+      .post("/api/friends", this.state)
       .then(function (response) {
         console.log(response);
       })
@@ -54,49 +62,49 @@ class profile extends React.Component {
     });
   }
   render() {
-    if (this.state.redirect) return <Redirect to="user" />;
-    var inputStyle = { width: "200px", height: "30px" };
 
+    var inputStyle = { width: "200px", height: "30px" };
+    if (this.state.imageClicked) {
+      return <ImageUploader
+        withIcon={true}
+        buttonText='Choose images'
+        onChange={this.onDrop}
+        imgExtension={['.jpg', '.gif', '.png', '.gif']}
+        maxFileSize={5242880}
+      />
+    }
     const {
-      username,
-      password,
-      newUser,
-      newAge,
-      newEmail,
-      newPassword
+      srchTerm,
+      friends
     } = this.state;
+    if (this.state.redirectedToHome) {
+      return <Redirect to='/'></Redirect>
+    }
     return (
+
       <div className='container'>
         <div className="wrapper">
           <div className="box">
-            <div className="row row-offcanvas row-offcanvas-left">
+            <div className="row row-offcanvas row-offcanvas-left" style={{ backgroundColor: 'silver' }}>
 
               {/* <!-- sidebar --> */}
-              <div className="column col-sm-2 col-xs-1 sidebar-offcanvas" id="sidebar">
+              <div className="column col-sm-2 col-xs-1 sidebar-offcanvas" id="sidebar" >
 
-                <ul className="nav">
+                <ul className="nav" >
                   <li><a href="#" data-toggle="offcanvas" className="visible-xs text-center"><i className="glyphicon glyphicon-chevron-right"></i></a></li>
                 </ul>
+                <div className="panel panel-default">
+                  <div className="panel-thumbnail"><img src={bg_5} className="img-responsive" onClick={this.handleClick} /></div>
+                  <div className="panel-body">
+                    <p className="lead">Urbanization</p>
+                    <p>45 Followers, 13 Posts</p>
 
-                <ul className="nav hidden-xs" id="lg-menu">
-                  <li className="active"><a href="#featured"><i className="glyphicon glyphicon-list-alt"></i> Featured</a></li>
-                  <li><a href="#stories"><i className="glyphicon glyphicon-list"></i> Stories</a></li>
-                  <li><a href="#"><i className="glyphicon glyphicon-paperclip"></i> Saved</a></li>
-                  <li><a href="#"><i className="glyphicon glyphicon-refresh"></i> Refresh</a></li>
-                </ul>
-                <ul className="list-unstyled hidden-xs" id="sidebar-footer">
-                  <li>
-                    <a href="http://usebootstrap.com/theme/facebook"><h3>Bootstrap</h3> <i className="glyphicon glyphicon-heart-empty"></i> Bootply</a>
-                  </li>
-                </ul>
+                    <p>
+                      <img src={uFp_tsTJboUY7kue5XAsGAs28} height="28px" width="28px" />
+                    </p>
+                  </div>
+                </div>
 
-                {/* <!-- tiny only nav--> */}
-                <ul className="nav visible-xs" id="xs-menu">
-                  <li><a href="#featured" className="text-center"><i className="glyphicon glyphicon-list-alt"></i></a></li>
-                  <li><a href="#stories" className="text-center"><i className="glyphicon glyphicon-list"></i></a></li>
-                  <li><a href="#" className="text-center"><i className="glyphicon glyphicon-paperclip"></i></a></li>
-                  <li><a href="#" className="text-center"><i className="glyphicon glyphicon-refresh"></i></a></li>
-                </ul>
 
               </div>
               {/* <!-- /sidebar --> */}
@@ -113,18 +121,18 @@ class profile extends React.Component {
                       <span className="icon-bar"></span>
                       <span className="icon-bar"></span>
                     </button>
-                    <a href="http://usebootstrap.com/theme/facebook" className="navbar-brand logo">b</a>
+                    <a href='' className="navbar-brand logo">fb</a>
                   </div>
                   <nav className="collapse navbar-collapse" role="navigation">
-                    <form className="navbar-form navbar-left">
+                    <form className="navbar-form navbar-left" onSubmit={this.handleSubmit}>
                       <div className="input-group input-group-sm" style={{ maxWidth: "360px" }}>
-                        <input className="form-control" placeholder="Search" name="srch-term" id="srch-term" type="text" />
+                        <input className="form-control" placeholder="Search" name="srchTerm" id="srch-term" type="text" onChange={this.handleChange} value={srchTerm} />
                         <div className="input-group-btn">
                           <button className="btn btn-default" type="submit"><i className="glyphicon glyphicon-search"></i></button>
                         </div>
                       </div>
                     </form>
-                    <ul className="nav navbar-nav">
+                    <ul className="nav navbar-nav" style={{ alignItems: 'center', flex: 1, flexDirection: 'row' }}>
                       <li>
                         <a href="#"><i className="glyphicon glyphicon-home"></i> Home</a>
                       </li>
@@ -139,7 +147,7 @@ class profile extends React.Component {
                       <li className="dropdown">
                         <a href="#" className="dropdown-toggle" data-toggle="dropdown"><i className="glyphicon glyphicon-user"></i></a>
                         <ul className="dropdown-menu">
-                          <li><a href="">More</a></li>
+                          <li><a href="" onClick={this.handleDisconnect.bind(this)}>Disconnect</a></li>
                           <li><a href="">More</a></li>
                           <li><a href="">More</a></li>
                           <li><a href="">More</a></li>
@@ -155,34 +163,15 @@ class profile extends React.Component {
                   <div className="full col-sm-9">
 
                     {/* <!-- content --> */}
-                    <div className="row">
+                    <div className="row" style={{ marginRight: -300 }}>
 
                       {/* <!-- main col left --> */}
-                      <div className="col-sm-5">
-
-                        <div className="panel panel-default">
-                          <div className="panel-thumbnail"><img src={bg_5} className="img-responsive" /></div>
-                          <div className="panel-body">
-                            <p className="lead">Urbanization</p>
-                            <p>45 Followers, 13 Posts</p>
-
-                            <p>
-                              <img src={uFp_tsTJboUY7kue5XAsGAs28} height="28px" width="28px" />
-                            </p>
-                          </div>
-                        </div>
+                      <div className="col-sm-7">
 
 
-                        <div className="panel panel-default">
-                          <div className="panel-heading"><a href="#" className="pull-right">View all</a> <h4>Bootstrap Examples</h4></div>
-                          <div className="panel-body">
-                            <div className="list-group">
-                              <a href="http://usebootstrap.com/theme/facebook" className="list-group-item">Modal / Dialog</a>
-                              <a href="http://usebootstrap.com/theme/facebook" className="list-group-item">Datetime Examples</a>
-                              <a href="http://usebootstrap.com/theme/facebook" className="list-group-item">Data Grids</a>
-                            </div>
-                          </div>
-                        </div>
+
+
+
 
                         <div className="well">
                           <form className="form-horizontal" role="form">
@@ -207,23 +196,14 @@ class profile extends React.Component {
                           </div>
                         </div>
 
-                        <div className="panel panel-default">
-                          <div className="panel-heading"><h4>What Is Bootstrap?</h4></div>
-                          <div className="panel-body">
-                            Bootstrap is front end frameworkto
-          build custom web applications that are fast, responsive &amp; intuitive.
-           It consist of CSS and HTML for typography, forms, buttons, tables,
-          grids, and navigation along with custom-built jQuery plug-ins and
-          support for responsive layouts. With dozens of reusable components for
-		navigation, pagination, labels, alerts etc..                          </div>
-                        </div>
+
 
 
 
                       </div>
 
                       {/* <!-- main col right --> */}
-                      <div className="col-sm-7">
+                      <div className="col-sm-5">
 
                         <div className="well">
                           <form className="form">

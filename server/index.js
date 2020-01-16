@@ -35,58 +35,93 @@ app.get("/signin", (req, res) => {
 app.post("/user", (req, res) => {
   res.send('request handled')
 });
+app.get('/user', (req, res) => {
+  //res.send('hello')
+  res.sendFile(path.join(__dirname, "../react-client/dist/index.html"));
+})
+app.get('/home', (req, res) => {
+  //res.send('hello')
+  res.sendFile(path.join(__dirname, "../react-client/dist/index.html"));
+})
+app.post('/api/friends', (req, res) => {
+  Users.selectAllByByUserName(req.body.srchTerm, (err, users) => {
+    if (err) {
+      console.log(err)
+    } else if (!users.length) {
+      res.status(400).json({ message: 'no such user found' })
+    }
+    else {
+      res.status(200).json(users)
+    }
+  })
+})
 app.post("/api/usersignup", (req, res) => {
   var { errors, isValid } = signUpValidator(req.body);
   if (!isValid) {
     res.status(400).json(errors)
   }
-  Users.selectOne({ username: req.body.newUser }, (err, data) => {
-    console.log(req.body)
-    if (err) {
-      console.log(err)
-    }
-    else if (!data) {
-      var hash = bcrypt.hashSync(req.body.newPassword, 8);
-      var newUser = { username: req.body.newUser, password: hash };
+  else {
+    Users.selectOne(req.body.newEmail, (err, data) => {
+      console.log(data)
+      if (err) {
+        console.log(err)
+      }
+      else if (data.length > 0) {
 
-      console.log('this is ', Users)
+        return res.send('user already exists')
+      }
+      else if (data.length === 0) {
+        var hash = bcrypt.hashSync(req.body.newPassword, 8);
+        var newUser = {
+          username: req.body.newUser,
+          password: hash,
+          age: req.body.newAge,
+          Email: req.body.newEmail,
 
-      Users.save(newUser, (err, result) => {
-        if (err) {
-          console.log(err)
+          Friends: [],
         }
-        else console.log('user added successfully')
-      })
-    }
+
+        //console.log('this is ', Users)
+
+        Users.save(newUser, (err, result) => {
+          if (err) {
+            console.log(err)
+          }
+          else res.send('user added successfully')
+        })
+      }
 
 
-    else console.log('user already exists')
-  })
+
+    })
+  }
 
 })
 app.post("/api/usersignin", (req, res) => {
+  // console.log('this is the request', req.body)
   var { errors, isValid } = signInValidator(req.body);
   if (!isValid) {
     res.status(400).json(errors)
   }
   else {
-    Users.selectOne({ username: req.body.username }, (err, data) => {
+    Users.selectOne(req.body.email, (err, data) => {
+      console.log(data)
       if (err) {
         console.log(err)
 
-      } else if (!data) {
-        res.status(400).json('user not found')
+      } else if (data.length === 0) {
+        res.status(400).json({ message: 'user not found' })
       }
       else {
         // Check password
         password = req.body.password
-        bcrypt.compare(password, data.password).then(isMatch => {
+        bcrypt.compare(password, data[0].password).then(isMatch => {
           if (isMatch) {
             // User matched
             // Create JWT Payload
             const payload = {
               id: data.id,
-              name: data.username
+              email: data.email
             };
             // Sign token
             jwt.sign(
@@ -107,7 +142,10 @@ app.post("/api/usersignin", (req, res) => {
               .status(400)
               .json({ passwordincorrect: "Password incorrect" });
           }
-        });
+        })
+          .catch(err => console.log(err));
+
+
       }
 
 

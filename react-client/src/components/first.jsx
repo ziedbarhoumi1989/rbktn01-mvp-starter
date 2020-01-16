@@ -8,7 +8,7 @@ class First extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
+      email: "",
       password: "",
       newUser: "",
       newAge: "",
@@ -18,6 +18,7 @@ class First extends React.Component {
       redirect: false
     };
     this.handleChange = this.handleChange.bind(this);
+    this.handleRegister = this.handleRegister.bind(this)
   }
   handleChange(e) {
     const target = e.target;
@@ -32,26 +33,34 @@ class First extends React.Component {
   }
   handleSignin(event) {
     event.preventDefault();
-    this.setState({ redirect: !this.state.redirect });
+    //this.setState({ redirect: !this.state.redirect });
     axios
       .post("/api/usersignin", this.state)
-      .then(function (response) {
-        console.log(response)
+      .then(response => {
+        console.log(response.data.success)
+
+        if (response.data.success) {
+          this.setState({ redirect: true })
+          console.log(typeof (response.data.token))
+          localStorage.setItem('user', response.data.token)
+        }
       })
       .catch(function (error) {
         console.log(error);
       });
-    this.setState({
-      [name]: ''
-    });
+
   }
   handleRegister(event) {
     event.preventDefault();
-    this.setState({ redirect: !this.state.redirect });
+    const that = this
+    //this.setState({ redirect: !this.state.redirect });
     axios
       .post("/api/usersignup", this.state)
-      .then(function (response) {
+      .then(response => {
         console.log(response);
+        if (response.data === "user added successfully") {
+          this.setState({ redirect: true });
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -65,7 +74,7 @@ class First extends React.Component {
     var inputStyle = { width: "200px", height: "30px" };
 
     const {
-      username,
+      email,
       password,
       newUser,
       newAge,
@@ -86,10 +95,10 @@ class First extends React.Component {
           >
             <form onSubmit={this.handleSignin.bind(this)}>
               <input
-                type="text"
-                value={username}
-                name="username"
-                placeholder="enter username"
+                type="email"
+                value={email}
+                name="email"
+                placeholder="enter your email"
                 onChange={this.handleChange}
                 required
               ></input>

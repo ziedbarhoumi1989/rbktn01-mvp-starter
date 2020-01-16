@@ -1,10 +1,22 @@
 import React from "react";
 import { Route, Redirect } from 'react-router-dom'
-export class Home extends React.Component {
+export default class Home extends React.Component {
   constructor(props) {
     super(props);
+    this.state = { isauthentified: false }
   }
+
+
   render() {
-    return <Redirect push to='/signin' />
+
+    var a = localStorage.getItem('user')
+    console.log(a)
+    if (a) {
+      return <Redirect to='/user' />
+    }
+    else {
+      <Redirect to='/signin' />
+    }
+
   }
 }
