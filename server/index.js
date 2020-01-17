@@ -47,7 +47,7 @@ app.post('/api/friends', (req, res) => {
   Users.selectAllByByUserName(req.body.srchTerm, (err, users) => {
     if (err) {
       console.log(err)
-    } else if (!users.length) {
+    } else if (users.length === 0) {
       res.status(400).json({ message: 'no such user found' })
     }
     else {

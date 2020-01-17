@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import DisplayFriends from './searchFriend.jsx'
+import Popup from "reactjs-popup";
 //import Webcam from "react-webcam";
 import ImageUploader from 'react-images-upload';
 import $ from "jquery";
@@ -23,12 +25,14 @@ class profile extends React.Component {
     this.state = {
       srchTerm: '',
       friends: [],
+      pictures: [],
       imageClicked: false,
       redirectedToHome: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleClick = this.handleClick.bind(this)
+    this.onDrop = this.onDrop.bind(this)
   }
   handleClick() {
     this.setState({ imageClicked: true })
@@ -46,13 +50,22 @@ class profile extends React.Component {
     localStorage.removeItem('user')
     this.setState({ redirectedToHome: true })
   }
+  onDrop(picture) {
+    this.setState({
+      pictures: this.state.pictures.concat(picture),
+    })
+  }
   handleSubmit(event) {
     event.preventDefault();
     this.setState({ redirect: !this.state.redirect });
     axios
       .post("/api/friends", this.state)
-      .then(function (response) {
+      .then(response => {
         console.log(response);
+        if (response.data.length === 0) {
+          response.data.push({ username: 'user not found' })
+        }
+        this.setState({ friends: response.data })
       })
       .catch(function (error) {
         console.log(error);
@@ -83,6 +96,8 @@ class profile extends React.Component {
     return (
 
       <div className='container'>
+        <DisplayFriends resultNames={this.state.friends}></DisplayFriends>
+
         <div className="wrapper">
           <div className="box">
             <div className="row row-offcanvas row-offcanvas-left" style={{ backgroundColor: 'silver' }}>
@@ -168,6 +183,7 @@ class profile extends React.Component {
                       {/* <!-- main col left --> */}
                       <div className="col-sm-7">
 
+                        <DisplayFriends resultNames={this.state.friends}></DisplayFriends>
 
 
 

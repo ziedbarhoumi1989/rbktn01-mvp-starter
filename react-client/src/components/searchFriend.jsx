@@ -1,39 +1,33 @@
 import React from 'react';
-import axios from 'axios';
-class SearchFriends extends React.component {
+import Popup from "reactjs-popup";
+class DisplayFriends extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      searchUser: ''
-    }
-    this.handleChange = this.handleChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
   }
-  handleChange(e) {
-    this.setState({
-      [e.target.name]: e.target.value
-    })
-  }
-  handleSubmit(e) {
-    e.preventDefault();
-    axios
-      .post('/api/Search', this.state)
-      .then((res) => console.log(res))
-      .catch(err => console.log(err))
-    this.setState({ searchUser: '' })
-  }
-
 
   render() {
-    return (<div>
-      <from onSubmit={this.handleSubmit} >
-        <input type= text name='Searched' value={this.state.searchUser} onChange={this.handleChange}></input>
-        <button type='submit' >Search</button>
+    console.log(this.props, 'props')
+    var arr = this.props.resultNames.map(name => {
+      return <h1>{name.username}</h1>
+    })
+    console.log(arr)
 
-      </from>
-    </div>)
+    if (arr.length > 0) {
+      return (<Popup trigger={< button > Trigger</button >} style={{
+        position: "right center"
+      }}>
+        <div>{arr}</div>
+      </Popup >)
+    } else {
+      return (<Popup trigger={< button > Trigger</button >} style={{
+        position: "right center"
+      }}>
+        <div>No Such user found</div>
+      </Popup >)
+    }
 
   }
 
 }
-export default SearchFriends;
+DisplayFriends.defaultProps = [{ username: 'user not found' }]
+export default DisplayFriends;
