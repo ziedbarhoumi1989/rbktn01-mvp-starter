@@ -11,6 +11,9 @@ export default class Home extends React.Component {
 
     var a = localStorage.getItem('user')
     console.log(a)
+    if (a === null) {
+      return <Redirect to='/signin' />
+    }
     if (a) {
       return <Redirect to='/user' />
     }

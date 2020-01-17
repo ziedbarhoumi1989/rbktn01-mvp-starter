@@ -67,7 +67,8 @@ class profile extends React.Component {
         }
         this.setState({ friends: response.data })
       })
-      .catch(function (error) {
+      .catch(error => {
+        this.setState({ friends: [{ username: 'user not found' }] })
         console.log(error);
       });
     this.setState({
@@ -96,7 +97,6 @@ class profile extends React.Component {
     return (
 
       <div className='container'>
-        <DisplayFriends resultNames={this.state.friends}></DisplayFriends>
 
         <div className="wrapper">
           <div className="box">
@@ -163,7 +163,7 @@ class profile extends React.Component {
                         <a href="#" className="dropdown-toggle" data-toggle="dropdown"><i className="glyphicon glyphicon-user"></i></a>
                         <ul className="dropdown-menu">
                           <li><a href="" onClick={this.handleDisconnect.bind(this)}>Disconnect</a></li>
-                          <li><a href="">More</a></li>
+                          <li><a href="">Settings</a></li>
                           <li><a href="">More</a></li>
                           <li><a href="">More</a></li>
                           <li><a href="">More</a></li>

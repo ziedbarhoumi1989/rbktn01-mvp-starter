@@ -55,6 +55,10 @@ app.post('/api/friends', (req, res) => {
     }
   })
 })
+app.post('/api/posts/add', (req, res) => {
+  var data = req.body;
+  console.log(data)
+})
 app.post("/api/usersignup", (req, res) => {
   var { errors, isValid } = signUpValidator(req.body);
   if (!isValid) {
@@ -120,7 +124,7 @@ app.post("/api/usersignin", (req, res) => {
             // User matched
             // Create JWT Payload
             const payload = {
-              id: data.id,
+              id: data._id,
               email: data.email
             };
             // Sign token
