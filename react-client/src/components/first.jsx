@@ -42,7 +42,7 @@ class First extends React.Component {
         if (response.data.success) {
           this.setState({ redirect: true })
           console.log(typeof (response.data.token))
-          localStorage.setItem('user', response.data.token)
+          localStorage.setItem('user', JSON.stringify(response.data))
         }
       })
       .catch(function (error) {

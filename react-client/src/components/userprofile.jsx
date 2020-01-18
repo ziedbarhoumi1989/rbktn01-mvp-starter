@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import DisplayFriends from './searchFriend.jsx'
+import PostList from './postList.jsx'
 import Popup from "reactjs-popup";
 //import Webcam from "react-webcam";
 import ImageUploader from 'react-images-upload';
+import Comments from './comments.js'
 import $ from "jquery";
 import axios from "axios";
 import '../styles/assets/css/bootstrap.css'
@@ -26,11 +28,15 @@ class profile extends React.Component {
       srchTerm: '',
       friends: [],
       pictures: [],
+      profile: {},
+      posts: [],
       imageClicked: false,
-      redirectedToHome: false
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+      redirectedToHome: false,
+      redirectedToUser: false,
+      redirectedToUpdateProfile: false
+    }
+    this.handleChange = this.handleChange.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
     this.handleClick = this.handleClick.bind(this)
     this.onDrop = this.onDrop.bind(this)
   }
@@ -46,6 +52,9 @@ class profile extends React.Component {
     });
     console.log(this.state);
   }
+  handleUpdataProfile() {
+    this.setState({ redirectedToUpdateProfile: true })
+  }
   handleDisconnect() {
     localStorage.removeItem('user')
     this.setState({ redirectedToHome: true })
@@ -55,6 +64,7 @@ class profile extends React.Component {
       pictures: this.state.pictures.concat(picture),
     })
   }
+
   handleSubmit(event) {
     event.preventDefault();
     this.setState({ redirect: !this.state.redirect });
@@ -75,6 +85,21 @@ class profile extends React.Component {
       [name]: ''
     });
   }
+  componentDidMount() {
+    var userId = JSON.parse(localStorage.getItem('user')).payLoad.id
+    console.log(userId)
+    axios
+      .get('/api/posts')
+      .then(response => {
+        console.log(response.data)
+        this.setState({
+          posts: response.data
+        })
+      })
+      .catch(err => console.log(err))
+
+  }
+
   render() {
 
     var inputStyle = { width: "200px", height: "30px" };
@@ -94,6 +119,11 @@ class profile extends React.Component {
     if (this.state.redirectedToHome) {
       return <Redirect to='/'></Redirect>
     }
+    if (this.state.redirectedToUpdateProfile) {
+      return <Redirect to='/updateprofile'></Redirect>
+    }
+
+
     return (
 
       <div className='container'>
@@ -149,7 +179,7 @@ class profile extends React.Component {
                     </form>
                     <ul className="nav navbar-nav" style={{ alignItems: 'center', flex: 1, flexDirection: 'row' }}>
                       <li>
-                        <a href="#"><i className="glyphicon glyphicon-home"></i> Home</a>
+                        <a href=""><i className="glyphicon glyphicon-home"></i> Home</a>
                       </li>
                       <li>
                         <a href="#postModal" role="button" data-toggle="modal"><i className="glyphicon glyphicon-plus"></i> Post</a>
@@ -163,7 +193,7 @@ class profile extends React.Component {
                         <a href="#" className="dropdown-toggle" data-toggle="dropdown"><i className="glyphicon glyphicon-user"></i></a>
                         <ul className="dropdown-menu">
                           <li><a href="" onClick={this.handleDisconnect.bind(this)}>Disconnect</a></li>
-                          <li><a href="">Settings</a></li>
+                          <li><a href="" onClick={this.handleUpdataProfile.bind(this)}>Update Profile</a></li>
                           <li><a href="">More</a></li>
                           <li><a href="">More</a></li>
                           <li><a href="">More</a></li>

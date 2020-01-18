@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import first from "./components/first.jsx";
 import home from "./components/home.jsx";
 import profile from "./components/userprofile.jsx"
+import UpdateProfile from "./components/updateProfile.jsx"
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
         <Route path="/" component={home} exact />
         <Route path="/signin" component={first} />
         <Route path="/user" component={profile} />
+        <Route path="/updateprofile" component={UpdateProfile} />
+
         <Route component={Error} />
       </Switch>
     </main>

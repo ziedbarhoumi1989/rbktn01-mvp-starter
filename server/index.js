@@ -43,6 +43,10 @@ app.get('/home', (req, res) => {
   //res.send('hello')
   res.sendFile(path.join(__dirname, "../react-client/dist/index.html"));
 })
+app.get('/updateProfile', (req, res) => {
+  //res.send('hello')
+  res.sendFile(path.join(__dirname, "../react-client/dist/index.html"));
+})
 app.post('/api/friends', (req, res) => {
   Users.selectAllByByUserName(req.body.srchTerm, (err, users) => {
     if (err) {
@@ -124,9 +128,10 @@ app.post("/api/usersignin", (req, res) => {
             // User matched
             // Create JWT Payload
             const payload = {
-              id: data._id,
-              email: data.email
+              id: data[0]._id,
+              email: data[0].Email
             };
+            console.log(payload)
             // Sign token
             jwt.sign(
               payload,
@@ -136,6 +141,7 @@ app.post("/api/usersignin", (req, res) => {
               },
               (err, token) => {
                 res.json({
+                  payload,
                   success: true,
                   token: "Bearer " + token
                 });
