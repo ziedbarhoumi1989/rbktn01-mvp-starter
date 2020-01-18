@@ -3,9 +3,10 @@ import ReactDOM from "react-dom";
 import DisplayFriends from './searchFriend.jsx'
 import PostList from './postList.jsx'
 import Popup from "reactjs-popup";
+
 //import Webcam from "react-webcam";
 import ImageUploader from 'react-images-upload';
-import Comments from './comments.js'
+import Posts from './post.js'
 import $ from "jquery";
 import axios from "axios";
 import '../styles/assets/css/bootstrap.css'
@@ -86,12 +87,12 @@ class profile extends React.Component {
     });
   }
   componentDidMount() {
-    var userId = JSON.parse(localStorage.getItem('user')).payLoad.id
-    console.log(userId)
+    //var userId = JSON.parse(localStorage.getItem('user')).payload.id
+    //console.log(userId)
     axios
       .get('/api/posts')
       .then(response => {
-        console.log(response.data)
+        console.log(response)
         this.setState({
           posts: response.data
         })

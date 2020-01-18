@@ -18,6 +18,22 @@ import photojpg from '../styles/assets/img/photo.jpg'
 import photopng from '../styles/assets/img/photo.png'
 import uFp_tsTJboUY7kue5XAsGAs28 from '../styles/assets/img/uFp_tsTJboUY7kue5XAsGAs28.png'
 
+//import auth from './../auth/auth-helper'
+import Card, { CardHeader, CardContent, CardActions } from '@material-ui/core/Card'
+import { typography } from '@material-ui/system';
+import Avatar from '@material-ui/core/Avatar';
+
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import CommentIcon from '@material-ui/icons/Comment';
+import Divider from '@material-ui/core/Divider';
+import PropTypes from 'prop-types'
+import { withStyles } from '@material-ui/styles'
+import { Link } from 'react-router-dom'
+import { remove, like, unlike } from './postHelper.js'
+
 //import List from "./components/List.jsx";
 class UpdateProfile extends React.Component {
   constructor(props) {
@@ -92,6 +108,7 @@ class UpdateProfile extends React.Component {
         maxFileSize={5242880}
       />
     }
+
     const {
       srchTerm,
       friends
@@ -183,154 +200,44 @@ class UpdateProfile extends React.Component {
                 {/* <!-- /top nav --> */}
 
                 <div className="padding">
-                  <div className="full col-sm-9">
+                  <Card className={classes.card}>
+                    <CardContent>
+                      <Typography type="headline" component="h2" className={classes.title}>
+                        Edit Profile
+          </Typography>
+                      <Avatar src={photoUrl} className={classes.bigAvatar} /><br />
+                      <input accept="image/*" onChange={this.handleChange('photo')} className={classes.input} id="icon-button-file" type="file" />
+                      <label htmlFor="icon-button-file">
+                        <Button variant="raised" color="default" component="span">
+                          Upload
+              <FileUpload />
+                        </Button>
+                      </label> <span className={classes.filename}>{this.state.photo ? this.state.photo.name : ''}</span><br />
+                      <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal" /><br />
+                      <TextField
+                        id="multiline-flexible"
+                        label="About"
+                        multiline
+                        rows="2"
+                        value={this.state.about}
+                        onChange={this.handleChange('about')}
+                        className={classes.textField}
+                        margin="normal"
+                      /><br />
+                      <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal" /><br />
+                      <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal" />
+                      <br /> {
+                        this.state.error && (<Typography component="p" color="error">
+                          <Icon color="error" className={classes.error}>error</Icon>
+                          {this.state.error}
+                        </Typography>)
+                      }
+                    </CardContent>
+                    <CardActions>
+                      <Button color="primary" variant="raised" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
+                    </CardActions>
+                  </Card>
 
-                    {/* <!-- content --> */}
-                    <div className="row" style={{ marginRight: -300 }}>
-
-                      {/* <!-- main col left --> */}
-                      <div className="col-sm-7">
-
-                        <DisplayFriends resultNames={this.state.friends}></DisplayFriends>
-
-
-
-
-
-                        <div className="well">
-                          <form className="form-horizontal" role="form">
-                            <h4>What's New</h4>
-                            <div className="form-group" style={{ padding: "14px" }}>
-                              <textarea className="form-control" placeholder="Update your status"></textarea>
-                            </div>
-                            <button className="btn btn-primary pull-right" type="button">Post</button><ul className="list-inline"><li><a href=""><i className="glyphicon glyphicon-upload"></i></a></li><li><a href=""><i className="glyphicon glyphicon-camera"></i></a></li><li><a href=""><i className="glyphicon glyphicon-map-marker"></i></a></li></ul>
-                          </form>
-                        </div>
-
-                        <div className="panel panel-default">
-                          <div className="panel-heading"><a href="#" className="pull-right">View all</a> <h4>More Templates</h4></div>
-                          <div className="panel-body">
-                            <img src={gif150} className="img-circle pull-right" /> <a href="#">Free @Bootply</a>
-                            <div className="clearfix"></div>
-                            There a load of new free Bootstrap 3
-           ready templates at Bootply. All of these templates are free and don't
-          require extensive customization to the Bootstrap baseline.
-											<hr />
-                            <ul className="list-unstyled"><li><a href="http://usebootstrap.com/theme/facebook">Dashboard</a></li><li><a href="http://usebootstrap.com/theme/facebook">Darkside</a></li><li><a href="http://usebootstrap.com/theme/facebook">Greenfield</a></li></ul>
-                          </div>
-                        </div>
-
-
-
-
-
-                      </div>
-
-                      {/* <!-- main col right --> */}
-                      <div className="col-sm-5">
-
-                        <div className="well">
-                          <form className="form">
-                            <h4>Sign-up</h4>
-                            <div className="input-group text-center">
-                              <input className="form-control input-lg" placeholder="Enter your email address" type="text" />
-                              <span className="input-group-btn"><button className="btn btn-lg btn-primary" type="button">OK</button></span>
-                            </div>
-                          </form>
-                        </div>
-
-                        <div className="panel panel-default">
-                          <div className="panel-heading"><a href="#" className="pull-right">View all</a> <h4>Bootply Editor &amp; Code Library</h4></div>
-                          <div className="panel-body">
-                            <p><img src={gif150} className="img-circle pull-right" /> <a href="#">The Bootstrap Playground</a></p>
-                            <div className="clearfix"></div>
-                            <hr />
-                            Design, build, test, and prototype
-          using Bootstrap in real-time from your Web browser. Bootply combines the
-           power of hand-coded HTML, CSS and JavaScript with the benefits of
-          responsive design using Bootstrap. Find and showcase Bootstrap-ready
-          snippets in the 100% free Bootply.com code repository.
-										  </div>
-                        </div>
-
-                        <div className="panel panel-default">
-                          <div className="panel-heading"><a href="#" className="pull-right">View all</a> <h4>Stackoverflow</h4></div>
-                          <div className="panel-body">
-                            <img src={gif150} className="img-circle pull-right" /> <a href="#">Keyword: Bootstrap</a>
-                            <div className="clearfix"></div>
-                            <hr />
-
-                            <p>If you're looking for help with Bootstrap code, the <code>twitter-bootstrap</code> tag at <a href="http://stackoverflow.com/questions/tagged/twitter-bootstrap">Stackoverflow</a> is a good place to find answers.</p>
-
-                            <hr />
-                            <form>
-                              <div className="input-group">
-                                <div className="input-group-btn">
-                                  <button className="btn btn-default">+1</button><button className="btn btn-default"><i className="glyphicon glyphicon-share"></i></button>
-                                </div>
-                                <input className="form-control" placeholder="Add a comment.." type="text" />
-                              </div>
-                            </form>
-
-                          </div>
-                        </div>
-
-                        <div className="panel panel-default">
-                          <div className="panel-heading"><a href="#" className="pull-right">View all</a> <h4>Portlet Heading</h4></div>
-                          <div className="panel-body">
-                            <ul className="list-group">
-                              <li className="list-group-item">Modals</li>
-                              <li className="list-group-item">Sliders / Carousel</li>
-                              <li className="list-group-item">Thumbnails</li>
-                            </ul>
-                          </div>
-                        </div>
-
-                        <div className="panel panel-default">
-                          <div className="panel-thumbnail"><img src={bg_4} className="img-responsive" /></div>
-                          <div className="panel-body">
-                            <p className="lead">Social Good</p>
-                            <p>1,200 Followers, 83 Posts</p>
-
-                            <p>
-                              <img src={photojpg} height="28px" width="28px" />
-                              <img src={photopng} height="28px" width="28px" />
-                              <img src={photo2} height="28px" width="28px" />
-                            </p>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                    {/* <!--/row--> */}
-
-                    <div className="row">
-                      <div className="col-sm-6">
-                        <a href="#">Twitter</a> <small className="text-muted">|</small> <a href="#">Facebook</a> <small className="text-muted">|</small> <a href="#">Google+</a>
-                      </div>
-                    </div>
-
-                    <div className="row" id="footer">
-                      <div className="col-sm-6">
-
-                      </div>
-                      <div className="col-sm-6">
-                        <p>
-                          <a href="#" className="pull-right">©Copyright 2013</a>
-                        </p>
-                      </div>
-                    </div>
-
-                    <hr />
-
-                    <h4 className="text-center">
-                      <a href="http://usebootstrap.com/theme/facebook" target="ext">Download this Template @Bootply</a>
-                    </h4>
-
-                    <hr />
-
-
-                  </div>
                   {/* <!-- /col-9 --> */}
                 </div>
                 {/* <!-- /padding --> */}

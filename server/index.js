@@ -164,6 +164,19 @@ app.post("/api/usersignin", (req, res) => {
 
 })
 
+
+
+//*******************************************POSTS AND COMMENTS */
+app.get('/api/posts', (req, res) => {
+  posts.selectAll((err, data) => {
+    if (err) {
+      console.log(err)
+      res.send('nothing')
+    }
+    else res.send(data)
+  })
+})
+
 app.use(express.static(__dirname + "/../react-client/dist"));
 
 app.listen(3000, function () {

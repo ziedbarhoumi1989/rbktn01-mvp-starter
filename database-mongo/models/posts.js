@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const db = require('../index.js');
 let postsSchema = mongoose.Schema({
-  createdBy: Object,
+  createdById: Object,
   content: String,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

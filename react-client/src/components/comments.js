@@ -5,8 +5,9 @@ import TextField from '../../../node_modules/@material-ui/core/TextField'
 import Avatar from '../../../node_modules/@material-ui/core/Avatar'
 import Icon from '../../../node_modules/@material-ui/core/Icon'
 import PropTypes from 'prop-types'
-import { withStyles } from '../../../node_modules/@material-ui/styles/withStyles'
-import { comment, uncomment } from './Apipost.js'
+// import { withStyles } from '../../../node_modules/@material-ui/styles/withStyles'
+import { withStyles } from '@material-ui/core/styles';
+import { comment, uncomment } from './postHelper.js'
 import { Link } from 'react-router-dom'
 
 const styles = theme => ({
@@ -53,8 +54,6 @@ class Comments extends Component {
       //const jwt = auth.isAuthenticated()
       comment({
         userId: JSON.parse(localStorage.getItem('user')).payload.id
-      }, {
-        t: jwt.token
       }, this.props.postId, { text: this.state.text }).then((data) => {
         if (data.error) {
           console.log(data.error)
@@ -67,11 +66,9 @@ class Comments extends Component {
   }
 
   deleteComment(event) {
-    const jwt = auth.isAuthenticated()
+
     uncomment({
       userId: jwt.user._id
-    }, {
-      t: jwt.token
     }, this.props.postId, comment).then((data) => {
       if (data.error) {
         console.log(data.error)

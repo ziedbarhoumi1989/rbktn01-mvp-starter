@@ -13,7 +13,7 @@ import Divider from '@material-ui/core/Divider';
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import { Link } from 'react-router-dom'
-import { remove, like, unlike } from './ApiPost.js'
+import { remove, like, unlike } from './postHelper.js'
 import Comments from './comments.js'
 
 const styles = theme => ({
@@ -67,17 +67,15 @@ class Post extends Component {
 
   checkLike(likes) {
     const jwt = auth.isAuthenticated()
-    let match = likes.indexOf(jwt.user._id) !== -1
+    let match = likes.indexOf(JSON.parse(localStorage.getItem('user')).payload.id) !== -1
     return match
   }
 
   like() {
     let callApi = this.state.like ? unlike : like
-    const jwt = auth.isAuthenticated()
+    // const jwt = auth.isAuthenticated()
     callApi({
-      userId: jwt.user._id
-    }, {
-      t: jwt.token
+      userId: JSON.parse(localStorage.getItem('user')).payload.id
     }, this.props.post._id).then((data) => {
       if (data.error) {
         console.log(data.error)
@@ -92,11 +90,9 @@ class Post extends Component {
   }
 
   deletePost() {
-    const jwt = auth.isAuthenticated()
+    //const jwt = auth.isAuthenticated()
     remove({
       postId: this.props.post._id
-    }, {
-      t: jwt.token
     }).then((data) => {
       if (data.error) {
         console.log(data.error)
