@@ -7,6 +7,7 @@ var jwt = require('jsonwebtoken')
 var items = require("../database-mongo");
 var Users = require("../database-mongo/models/user.js");
 var posts = require("../database-mongo/models/posts.js");
+var Comments = require("../database-mongo/models/comments.js");
 var signUpValidator = require('./validation/signupValidation')
 var signInValidator = require('./validation/signinValidation')
 var app = express();
@@ -61,42 +62,44 @@ app.post('/api/friends', (req, res) => {
     }
   })
 })
-app.post('/api/friends/addFriend/:userId',(req,res)=>{
-  users.selectOneById({_id:req.params.id},(err,result)=>{
-    if(err ||!result) {
+app.post('/api/friends/addFriend/:userId', (req, res) => {
+  users.selectOneById({ _id: req.params.id }, (err, result) => {
+    if (err || !result) {
       console.log(err)
       res.status(400).json(err)
-    }else {
+    } else {
       result[0]["friends"].push(req.body)
-      Users.save(result[0],(err,data)=>{
-        if(err) {
+      Users.save(result[0], (err, data) => {
+        if (err) {
           console.log(err)
-        }else{
-          res.status(200).json({message:'friend successfully added'})
+        } else {
+          res.status(200).json({ message: 'friend successfully added' })
         }
       })
       res.status(200).json(data)
     }
   })
 })
-app.post('/api/friends/removeFriend/userid',(req,res)=>{
-  Users.selectOneById({_id:req.params.id},(err,data)=> {
-    if(err ||data.length ===0) {
-      res.status(400).json({message:'User update settings failed'})
+app.post('/api/friends/removeFriend/:userid', (req, res) => {
+  Users.selectOneById({ _id: req.params.id }, (err, data) => {
+    if (err || data.length === 0) {
+      res.status(400).json({ message: 'User update settings failed' })
     }
     else {
       var arr = data[0]['friends']
-      for(var i=0;i<arr.length;i++) {
-        if(arr[i]._id ===red.body.id) {
-          arr.splice(arr.indexOf(req.body),1)
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i]._id === red.body.id) {
+          arr.splice(arr.indexOf(req.body), 1)
           break;
         }
       }
-      res.status(200).json({message:`${req.body.username} is no longer a friend`})
+      res.status(200).json({ message: `${req.body.username} is no longer a friend` })
     }
   })
 })
+//****************END OF FRIENDS ROUTES */
 
+//****************SIGNUP AN SIGNIN ROUTES */
 app.post("/api/usersignup", (req, res) => {
   var { errors, isValid } = signUpValidator(req.body);
   if (!isValid) {
@@ -197,54 +200,64 @@ app.post("/api/usersignin", (req, res) => {
   }
 
 })
-app.post('/api/user/:userid',(req,res)=> {
+//****************************END OF SIGNIN AND SIGNUP ROUTES */
+
+//****************************GET THE USER INFORMATION */
+app.get('/api/user/:userid', (req, res) => {
   console.log(req.body);
-  res.send('hello')
+  Users.selectOneById(req.params.id, (err, data) => {
+    console.log('data from getting user id is', data)
+    if (err || !data) {
+      console.log(err)
+      res.status(400).json(err)
+    } else {
+      res.status(200).json(data)
+    }
+
+  })
 })
 
 
 
 //*******************************************POSTS AND COMMENTS */
+
+
+/////****************************************POSTS ROUTES */
 app.get('/api/posts', (req, res) => {
-  Users.selectOneById(req.body.id,(err,data)=> {
-    if(err ||data.length ===0) {
-      res.status(400).json({message:'no posts to show'})
+  Users.selectOneById(req.body.id, (err, data) => {
+    console.log(data)
+    if (err || data.length === 0) {
+      res.status(400).json({ message: 'no posts to show' })
     }
     else {
       var result = []
       var arr = data[0]['friends']
-      for(var i=0;i<arr.length;i++ ) {
-        posts.selectByUserId(req.body.id,(err,post)=> {
-          if(!err&&post) {
+      for (var i = 0; i < arr.length; i++) {
+        posts.selectByUserId(req.body.id, (err, post) => {
+          if (!err && post) {
             result.push(post)
           }
         })
       }
-      res.status(200).json({data:result})
+      res.status(200).json(result)
     }
   })
-  posts.selectAll((err, data) => {
-    if (err) {
-      console.log(err)
-      res.send('nothing')
-    }
-    else res.send(data)
-  })
+
 })
-app.post('/api/posts/delete/:postId',(req,res)=> {
-  posts.selectOneById(req.params.postId,(err,result)=> {
-    if(err ||result.length ===0) {
-      res.status(400).json({message:'delete post disabled'})
+app.post('/api/posts/delete/:postId', (req, res) => {
+  posts.selectOneById(req.params.postId, (err, result) => {
+    if (err || result.length === 0) {
+      res.status(400).json({ message: 'delete post disabled' })
     }
     else {
-      if(data[0].createdById === req.bod.id) {
-        posts.Delete(req.parmas.id,(err,data)=> {
-          if(err) {
+      if (data[0].createdById === req.bod.id) {
+        posts.Delete(req.parmas.id, (err, data) => {
+          if (err) {
             console.log(err)
             res.status(400).json(error)
           }
           else {
-            res.status(200).json({message:'post successfully deleted'})
+            res.status(200).json({ message: 'post successfully deleted' })
           }
         })
       }
@@ -258,17 +271,63 @@ app.post('/api/posts/add', (req, res) => {
   newPost.createdById = req.body.id
   newPost.content = req.body.newPost
   newPost.createdAt = Date.now()
-  posts.save(newPost,(err,result)=>{
-    if(err) {
+  posts.save(newPost, (err, result) => {
+    if (err) {
       console.log(err)
     }
-    else{
+    else {
+      console.log('post successfully added')
       res.status(200).json(result)
     }
   })
 
 })
-///////////// POSTS ROUTES///////////////////////
+/////////////END OF  POSTS ROUTES///////////////////////
+
+///*************************************COMMENTS ROUTS */
+app.post('api/comments/addComment/:postid', (req, res) => {
+  posts.selectOneById(req.params.id, (err, result) => {
+    if (err || result.length === 0) {
+      res.status(400).json({ message: 'no posts to comment' })
+    }
+    else {
+      var comment = {}
+      comment.createdById = req.body.id;
+      comment.postId = req.params.postId
+      comment.content = req.body.commentText
+      comment.createdAt = Date.now()
+      result[0]['commments'].push(comment)
+      posts.save(result[0], (err, data) => {
+        if (err) {
+          console.log(err)
+        }
+        else {
+          console.log('post successfully added')
+        }
+      })
+      comments.save(comment, (err, data) => {
+        if (err) {
+          res.status(400).json(err)
+        } else {
+          res.status(200).json(data)
+        }
+      })
+
+    }
+  })
+})
+
+app.post('api/comments/delete/:commentid', (req, res) => {
+  comments.Delete(req.params.commentid, (err, result) => {
+    if (err) {
+      res.status(400).json({ message: "can't delete this comment try again later" })
+    }
+    else {
+      res.status(200).json({ message: 'comment successfully deleted' })
+    }
+  })
+})
+
 
 app.use(express.static(__dirname + "/../react-client/dist"));
 

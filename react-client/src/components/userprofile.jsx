@@ -26,13 +26,13 @@ class profile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      id:'',
+      id: '',
       srchTerm: '',
       friends: [],
       pictures: [],
       profile: {},
       posts: [],
-      newPost:'',
+      newPost: '',
       imageClicked: false,
       redirectedToHome: false,
       redirectedToUser: false,
@@ -90,31 +90,32 @@ class profile extends React.Component {
   }
   handleAddPost(e) {
     e.preventDefault()
-    if(localStorage &&localStorage.getItem('user')) {
-      id=JSON.parse(localStorge.getItem('user')).payload.id
-      this.setState({id:id})
+    if (localStorage && localStorage.getItem('user')) {
+      id = JSON.parse(localStorge.getItem('user')).payload.id
+      this.setState({ id: id })
     }
-    axios.post('/api/posts/add',this.state).then(response=> {
+    axios.post('/api/posts/add', this.state).then(response => {
       console.log(response)
-      this.setState({posts:response.data})
+      this.setState({ posts: response.data })
     })
-    .catch(error=> {
-      console.log(error)
-    })
+      .catch(error => {
+        console.log(error)
+      })
 
   }
   componentDidMount() {
-    if(localStorage &&localStorage.getItem('user'))
-    {var userId = JSON.parse(localStorage.getItem('user')).payload.id
-    console.log(userId)}
-    axios.get('/api/user/:'+userId)
-    .then(resonse=> {
-      console.log(response)
-      this.setState({profile:response.data})
-    })
-    .catch(error=>{
-      console.log(error)
-    })
+    if (localStorage && localStorage.getItem('user')) {
+      var userId = JSON.parse(localStorage.getItem('user')).payload.id
+      console.log(userId)
+    }
+    axios.get('/api/user/:' + userId)
+      .then(resonse => {
+        console.log(response)
+        this.setState({ profile: response.data })
+      })
+      .catch(error => {
+        console.log(error)
+      })
     axios
       .get('/api/posts')
       .then(response => {
@@ -166,9 +167,9 @@ class profile extends React.Component {
                   <li><a href="#" data-toggle="offcanvas" className="visible-xs text-center"><i className="glyphicon glyphicon-chevron-right"></i></a></li>
                 </ul>
                 <div className="panel panel-default">
-                  <div className="panel-thumbnail"><img src={this.state.profile.myImage||'data:image/jpeg;base64,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'} className="img-responsive" onClick={this.handleClick} /></div>
+                  <div className="panel-thumbnail"><img src={this.state.profile.myImage || 'data:image/jpeg;base64,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'} className="img-responsive" onClick={this.handleClick} /></div>
                   <div className="panel-body">
-                    <p className="lead">{this.state.profile.username ||'default'}</p>
+                    <p className="lead">{this.state.profile.username || 'default'}</p>
                     <p>45 friends, 13 Posts</p>
 
                     <p>
@@ -255,7 +256,7 @@ class profile extends React.Component {
                             <button className="btn btn-primary pull-right" type="button">Post</button><ul className="list-inline"><li><a href=""><i className="glyphicon glyphicon-upload"></i></a></li><li><a href=""><i className="glyphicon glyphicon-camera"></i></a></li><li><a href=""><i className="glyphicon glyphicon-map-marker"></i></a></li></ul>
                           </form>
                           <div>
-                          <form>
+                            <form>
                               <div className="input-group">
                                 <div className="input-group-btn">
                                   <button className="btn btn-default">+1</button><button className="btn btn-default"><i className="glyphicon glyphicon-share"></i></button>
@@ -263,7 +264,7 @@ class profile extends React.Component {
                                 <input className="form-control" placeholder="Add a comment.." type="text" />
                               </div>
                             </form>
-                            </div>
+                          </div>
                         </div>
 
                         <div className="panel panel-default">
@@ -304,16 +305,7 @@ class profile extends React.Component {
                           </div>
                         </div>
 
-                        <div className="panel panel-default">
-                          <div className="panel-heading"><a href="#" className="pull-right">View all</a> <h4>Portlet Heading</h4></div>
-                          <div className="panel-body">
-                            <ul className="list-group">
-                              <li className="list-group-item">Modals</li>
-                              <li className="list-group-item">Sliders / Carousel</li>
-                              <li className="list-group-item">Thumbnails</li>
-                            </ul>
-                          </div>
-                        </div>
+
 
 
 
@@ -321,11 +313,7 @@ class profile extends React.Component {
                     </div>
                     {/* <!--/row--> */}
 
-                    <div className="row">
-                      <div className="col-sm-6">
-                        <a href="#">Twitter</a> <small className="text-muted">|</small> <a href="#">Facebook</a> <small className="text-muted">|</small> <a href="#">Google+</a>
-                      </div>
-                    </div>
+
 
 
 
@@ -353,24 +341,25 @@ class profile extends React.Component {
                 Update Status
 			  </div>
               <div className="modal-body">
-                <form className="form center-block" onSubmit ={this.handleAddPost.bind(this)}>
+                <form className="form center-block" onSubmit={this.handleAddPost.bind(this)}>
                   <div className="form-group">
-                    <textarea className="form-control input-lg" autoFocus="" placeholder="What do you want to share?" name = 'newPost' value = {this.state.newPost} onChange = {this.handleChange}></textarea>
+                    <textarea className="form-control input-lg" autoFocus="" placeholder="What do you want to share?" name='newPost' value={this.state.newPost} onChange={this.handleChange}></textarea>
+                  </div>
+
+
+                  <div className="modal-footer">
+                    <div>
+                      <button className="btn btn-primary btn-sm" data-dismiss="modal" aria-hidden="true"  >Post</button>
+                      <ul className="pull-left list-inline"><li><a href=""><i className="glyphicon glyphicon-upload"></i></a></li><li><a href=""><i className="glyphicon glyphicon-camera"></i></a></li><li><a href=""><i className="glyphicon glyphicon-map-marker"></i></a></li></ul>
+                    </div>
                   </div>
                 </form>
               </div>
-              <div className="modal-footer">
-                <div>
-                  <button className="btn btn-primary btn-sm" data-dismiss="modal" aria-hidden="true" >Post</button>
-                  <ul className="pull-left list-inline"><li><a href=""><i className="glyphicon glyphicon-upload"></i></a></li><li><a href=""><i className="glyphicon glyphicon-camera"></i></a></li><li><a href=""><i className="glyphicon glyphicon-map-marker"></i></a></li></ul>
-                </div>
-              </div>
             </div>
           </div>
-        </div>
-      </div >
-    )
-  }
-}
+        </div >
+        )
+      }
+    }
 
-export default profile;
+    export default profile;

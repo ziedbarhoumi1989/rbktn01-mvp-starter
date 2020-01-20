@@ -3,10 +3,11 @@ const bcrypt = require('bcryptjs');
 const db = require('../index.js');
 let commentsSchema = mongoose.Schema({
   createdById: String,
+  postId: String,
   content: String,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  comments:[Object]
+
 
 })
 
@@ -15,17 +16,20 @@ let commentsSchema = mongoose.Schema({
 const selectAll = function (callback) {
   commentsModel.find({}, callback)
 }
-const save = function (post, callback) {
-  commentsModel.create(post, callback)
+const selectAllByPostId = function (postId, callback) {
+  commentsModel.find({ postId: postId }, callback)
+}
+const save = function (comment, callback) {
+  commentsModel.create(comment, callback)
 }
 const selectOne = function (id, callback) {
-  commentsModel.findOne({ id: id }, callback)
+  commentsModel.findOne({ _id: id }, callback)
 }
-const update = function(id,content,callback) {
-  commentsModel.findOneAndUpdate({id:id},{content},callback)
+const update = function (id, content, callback) {
+  commentsModel.findOneAndUpdate({ _id: id }, { content }, callback)
 }
-const Delete = function(id,callback) {
-  commentsModel.findOneByIdAndRemove({id:id},callback)
+const Delete = function (id, callback) {
+  commentsModel.findOneByIdAndRemove({ _id: id }, callback)
 }
 
 let commentsModel = mongoose.model('comments', commentsSchema)
