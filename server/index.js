@@ -47,6 +47,8 @@ app.get('/updateProfile', (req, res) => {
   //res.send('hello')
   res.sendFile(path.join(__dirname, "../react-client/dist/index.html"));
 })
+
+/////////////friends route////////////////////////////
 app.post('/api/friends', (req, res) => {
   Users.selectAllByByUserName(req.body.srchTerm, (err, users) => {
     if (err) {
@@ -59,10 +61,42 @@ app.post('/api/friends', (req, res) => {
     }
   })
 })
-app.post('/api/posts/add', (req, res) => {
-  var data = req.body;
-  console.log(data)
+app.post('/api/friends/addFriend/:userId',(req,res)=>{
+  users.selectOneById({_id:req.params.id},(err,result)=>{
+    if(err ||!result) {
+      console.log(err)
+      res.status(400).json(err)
+    }else {
+      result[0]["friends"].push(req.body)
+      Users.save(result[0],(err,data)=>{
+        if(err) {
+          console.log(err)
+        }else{
+          res.status(200).json({message:'friend successfully added'})
+        }
+      })
+      res.status(200).json(data)
+    }
+  })
 })
+app.post('/api/friends/removeFriend/userid',(req,res)=>{
+  Users.selectOneById({_id:req.params.id},(err,data)=> {
+    if(err ||data.length ===0) {
+      res.status(400).json({message:'User update settings failed'})
+    }
+    else {
+      var arr = data[0]['friends']
+      for(var i=0;i<arr.length;i++) {
+        if(arr[i]._id ===red.body.id) {
+          arr.splice(arr.indexOf(req.body),1)
+          break;
+        }
+      }
+      res.status(200).json({message:`${req.body.username} is no longer a friend`})
+    }
+  })
+})
+
 app.post("/api/usersignup", (req, res) => {
   var { errors, isValid } = signUpValidator(req.body);
   if (!isValid) {
@@ -163,11 +197,32 @@ app.post("/api/usersignin", (req, res) => {
   }
 
 })
+app.post('/api/user/:userid',(req,res)=> {
+  console.log(req.body);
+  res.send('hello')
+})
 
 
 
 //*******************************************POSTS AND COMMENTS */
 app.get('/api/posts', (req, res) => {
+  Users.selectOneById(req.body.id,(err,data)=> {
+    if(err ||data.length ===0) {
+      res.status(400).json({message:'no posts to show'})
+    }
+    else {
+      var result = []
+      var arr = data[0]['friends']
+      for(var i=0;i<arr.length;i++ ) {
+        posts.selectByUserId(req.body.id,(err,post)=> {
+          if(!err&&post) {
+            result.push(post)
+          }
+        })
+      }
+      res.status(200).json({data:result})
+    }
+  })
   posts.selectAll((err, data) => {
     if (err) {
       console.log(err)
@@ -176,6 +231,44 @@ app.get('/api/posts', (req, res) => {
     else res.send(data)
   })
 })
+app.post('/api/posts/delete/:postId',(req,res)=> {
+  posts.selectOneById(req.params.postId,(err,result)=> {
+    if(err ||result.length ===0) {
+      res.status(400).json({message:'delete post disabled'})
+    }
+    else {
+      if(data[0].createdById === req.bod.id) {
+        posts.Delete(req.parmas.id,(err,data)=> {
+          if(err) {
+            console.log(err)
+            res.status(400).json(error)
+          }
+          else {
+            res.status(200).json({message:'post successfully deleted'})
+          }
+        })
+      }
+    }
+  })
+})
+app.post('/api/posts/add', (req, res) => {
+  var data = req.body;
+  console.log(data)
+  var newPost = {}
+  newPost.createdById = req.body.id
+  newPost.content = req.body.newPost
+  newPost.createdAt = Date.now()
+  posts.save(newPost,(err,result)=>{
+    if(err) {
+      console.log(err)
+    }
+    else{
+      res.status(200).json(result)
+    }
+  })
+
+})
+///////////// POSTS ROUTES///////////////////////
 
 app.use(express.static(__dirname + "/../react-client/dist"));
 

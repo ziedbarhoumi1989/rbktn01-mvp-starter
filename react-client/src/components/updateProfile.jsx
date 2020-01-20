@@ -14,56 +14,41 @@ import photo2 from '../styles/assets/img/photo_002.jpg'
 import gif150 from '../styles/assets/img/150x150.gif'
 import bg_4 from '../styles/assets/img/bg_4.jpg'
 import bg_5 from '../styles/assets/img/bg_5.jpg'
+import photoUrl from '../styles/assets/img/bg_5.jpg'
 import photojpg from '../styles/assets/img/photo.jpg'
 import photopng from '../styles/assets/img/photo.png'
 import uFp_tsTJboUY7kue5XAsGAs28 from '../styles/assets/img/uFp_tsTJboUY7kue5XAsGAs28.png'
 
-//import auth from './../auth/auth-helper'
-import Card, { CardHeader, CardContent, CardActions } from '@material-ui/core/Card'
-import { typography } from '@material-ui/system';
-import Avatar from '@material-ui/core/Avatar';
 
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
-import CommentIcon from '@material-ui/icons/Comment';
-import Divider from '@material-ui/core/Divider';
-import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/styles'
-import { Link } from 'react-router-dom'
-import { remove, like, unlike } from './postHelper.js'
 
 //import List from "./components/List.jsx";
 class UpdateProfile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      srchTerm: '',
-      friends: [],
-      profile: {},
-      pictures: [],
-      imageClicked: false,
+      fullname: "",
+      dateOfBirth: "",
+      email: "",
+      about: "",
+      myImage: "",
       redirectedToHome: false,
       redirectedToUser: false
     };
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+
     this.handleClick = this.handleClick.bind(this)
     this.onDrop = this.onDrop.bind(this)
   }
   handleClick() {
     this.setState({ imageClicked: true })
   }
-  handleChange(e) {
-    const target = e.target;
-    const value = target.value;
-    const name = target.name;
-    this.setState({
-      [name]: value
-    });
-    console.log(this.state);
-  }
+  handleChange (name) {event => {
+    const value = name === 'photo'
+      ? event.target.files[0]
+      : event.target.value
+    this.userData.set(name, value)
+    this.setState({ [name]: value })
+  }}
   handleDisconnect() {
     localStorage.removeItem('user')
     this.setState({ redirectedToHome: true })
@@ -73,66 +58,66 @@ class UpdateProfile extends React.Component {
       pictures: this.state.pictures.concat(picture),
     })
   }
+  onCHangeHandler(e) {
+    this.setState({ [e.target.name]: e.target.value });
+  }
   handleHomeClicked() {
     this.setState({ redirectedToUser: true })
   }
-  handleSubmit(event) {
-    event.preventDefault();
-    this.setState({ redirect: !this.state.redirect });
-    axios
-      .post("/api/friends", this.state)
-      .then(response => {
-        console.log(response);
-        if (response.data.length === 0) {
-          response.data.push({ username: 'user not found' })
+  onSubmitHandler(e) {
+    e.preventDefault();
+    if (
+      this.state.fullname !== "" ||
+      this.state.dateOfBirth !== "" ||
+      this.state.email !== "" ||
+      this.state.about !== "" ||
+      this.state.myImage !== ""
+    ) {
+      let User = {};
+      if (localStorage && localStorage.getItem("user")) {
+        User = JSON.parse(localStorage.getItem("user"));
+        this.setState({
+          userId: User.payload.id
+        });
+      }
+      console.log(User)
+      var obj = this.state;
+      for (var key in obj) {
+        if (obj[key] === "") {
+          delete obj[key];
         }
-        this.setState({ friends: response.data })
-      })
-      .catch(error => {
-        this.setState({ friends: [{ username: 'user not found' }] })
-        console.log(error);
+      }
+      console.log(obj);
+      $.ajax({
+        url: `/api/users/${User.payload.id}`,
+        type: "PUT",
+        data: this.state,
+        success: data => {
+          this.setState({ redirectToProfilePage: true });
+        }
       });
-    this.setState({
-      [name]: ''
-    });
+    } else {
+      this.setState({ redirectToProfilePage: true });
+    }
   }
   render() {
-
+    const { fullname, dateOfBirth, email, about, myImage } = this.state;
     var inputStyle = { width: "200px", height: "30px" };
-    if (this.state.imageClicked) {
-      return <ImageUploader
-        withIcon={true}
-        buttonText='Choose images'
-        onChange={this.onDrop}
-        imgExtension={['.jpg', '.gif', '.png', '.gif']}
-        maxFileSize={5242880}
-      />
-    }
 
-    const {
-      srchTerm,
-      friends
-    } = this.state;
-    if (this.state.redirectedToHome) {
-      return <Redirect to='/'></Redirect>
-    }
+
+
+
     if (this.state.redirectedToUser) {
       return <Redirect to='/user'></Redirect>
     }
-    const { classes } = this.props
-    const photoUrl = this.state.id
-      ? `/api/users/photo/${this.state.id}?${new Date().getTime()}`
-      : '/api/users/defaultphoto'
-    if (this.state.redirectToProfile) {
-      return (<Redirect to={'/user/' + this.state.id} />)
-    }
+
     return (
 
       <div className='container'>
 
         <div className="wrapper">
           <div className="box">
-            <div className="row row-offcanvas row-offcanvas-left" style={{ backgroundColor: 'silver' }}>
+            <div className="row row-offcanvas row-offcanvas-left" style={{ backgroundColor: 'blue' }}>
 
               {/* <!-- sidebar --> */}
               <div className="column col-sm-2 col-xs-1 sidebar-offcanvas" id="sidebar" >
@@ -140,17 +125,7 @@ class UpdateProfile extends React.Component {
                 <ul className="nav" >
                   <li><a href="#" data-toggle="offcanvas" className="visible-xs text-center"><i className="glyphicon glyphicon-chevron-right"></i></a></li>
                 </ul>
-                <div className="panel panel-default">
-                  <div className="panel-thumbnail"><img src={bg_5} className="img-responsive" onClick={this.handleClick} /></div>
-                  <div className="panel-body">
-                    <p className="lead">Urbanization</p>
-                    <p>45 Followers, 13 Posts</p>
 
-                    <p>
-                      <img src={uFp_tsTJboUY7kue5XAsGAs28} height="28px" width="28px" />
-                    </p>
-                  </div>
-                </div>
 
 
               </div>
@@ -173,7 +148,8 @@ class UpdateProfile extends React.Component {
                   <nav className="collapse navbar-collapse" role="navigation">
                     <form className="navbar-form navbar-left" onSubmit={this.handleSubmit}>
                       <div className="input-group input-group-sm" style={{ maxWidth: "360px" }}>
-                        <input className="form-control" placeholder="Search" name="srchTerm" id="srch-term" type="text" onChange={this.handleChange} value={srchTerm} />
+                        <input className="form-control" placeholder="Search" name="srchTerm" id="srch-term" type="text"
+                        />
                         <div className="input-group-btn">
                           <button className="btn btn-default" type="submit"><i className="glyphicon glyphicon-search"></i></button>
                         </div>
@@ -206,44 +182,72 @@ class UpdateProfile extends React.Component {
                 </div>
                 {/* <!-- /top nav --> */}
 
-                <div className="padding">
-                  <Card className={classes.card}>
-                    <CardContent>
-                      <Typography type="headline" component="h2" className={classes.title}>
-                        Edit Profile
-          </Typography>
-                      <Avatar src={photoUrl} className={classes.bigAvatar} /><br />
-                      <input accept="image/*" onChange={this.handleChange('photo')} className={classes.input} id="icon-button-file" type="file" />
-                      <label htmlFor="icon-button-file">
-                        <Button variant="raised" color="default" component="span">
-                          Upload
-              <FileUpload />
-                        </Button>
-                      </label> <span className={classes.filename}>{this.state.photo ? this.state.photo.name : ''}</span><br />
-                      <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal" /><br />
-                      <TextField
-                        id="multiline-flexible"
-                        label="About"
-                        multiline
-                        rows="2"
-                        value={this.state.about}
-                        onChange={this.handleChange('about')}
-                        className={classes.textField}
-                        margin="normal"
-                      /><br />
-                      <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal" /><br />
-                      <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal" />
-                      <br /> {
-                        this.state.error && (<Typography component="p" color="error">
-                          <Icon color="error" className={classes.error}>error</Icon>
-                          {this.state.error}
-                        </Typography>)
-                      }
-                    </CardContent>
-                    <CardActions>
-                      <Button color="primary" variant="raised" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
-                    </CardActions>
-                  </Card>
+                <div className="padding"  style= {{paddingTop:'60px'}}>
+                <form onSubmit={this.onSubmitHandler.bind(this)}>
+            <fieldset>
+              <legend>Edit User Profile</legend>
+
+              <div className="form-group">
+                <label htmlFor="fullName">Name </label>
+                <input
+                  type="text"
+                  value={fullname}
+                  name="fullname"
+                  className="form-control"
+                  id="fullName"
+                  aria-describedby="emailHelp"
+                  placeholder="Enter Your Full Name"
+                  onChange={this.onCHangeHandler.bind(this)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="dateOfBirth">Date Of Birth</label>
+                <input
+                  type="date"
+                  value={dateOfBirth}
+                  name="birthDate"
+                  className="form-control"
+                  id="dateOfBirth"
+                  placeholder="Enter Your Birth Date"
+                  onChange={this.onCHangeHandler.bind(this)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email">Phone Number</label>
+                <input
+                  type="email"
+                  value={email}
+                  name="email"
+                  className="form-control"
+                  id="email"
+                  placeholder="Enter Your email"
+                  onChange={this.onCHangeHandler.bind(this)}
+                />
+
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="about">About</label>
+                <textarea
+                  className="form-control"
+                  value={about}
+                  name="about"
+                  id="about"
+                  rows="3"
+                  onChange={this.onCHangeHandler.bind(this)}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="urlPic">choose a profile photo</label>
+                <input type="file" name="myImage" accept="image/*" />
+              </div>
+              <button type="submit" className="btn btn-primary">
+                Submit
+              </button>
+            </fieldset>
+          </form>
 
                   {/* <!-- /col-9 --> */}
                 </div>
@@ -257,29 +261,7 @@ class UpdateProfile extends React.Component {
 
 
         {/* <!--post modal--> */}
-        <div id="postModal" className="modal fade" tabIndex="-1" role="dialog" aria-hidden="true">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <button type="button" className="close" data-dismiss="modal" aria-hidden="true">×</button>
-                Update Status
-			  </div>
-              <div className="modal-body">
-                <form className="form center-block">
-                  <div className="form-group">
-                    <textarea className="form-control input-lg" autoFocus="" placeholder="What do you want to share?"></textarea>
-                  </div>
-                </form>
-              </div>
-              <div className="modal-footer">
-                <div>
-                  <button className="btn btn-primary btn-sm" data-dismiss="modal" aria-hidden="true">Post</button>
-                  <ul className="pull-left list-inline"><li><a href=""><i className="glyphicon glyphicon-upload"></i></a></li><li><a href=""><i className="glyphicon glyphicon-camera"></i></a></li><li><a href=""><i className="glyphicon glyphicon-map-marker"></i></a></li></ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+
       </div >
     )
   }

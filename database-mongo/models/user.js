@@ -22,12 +22,22 @@ const save = function (user, callback) {
 const selectOne = function (email, callback) {
   UserModel.find({ Email: email }, callback)
 }
+const selectOneById = function (id, callback) {
+  UserModel.find({ _id: id }, callback)
+}
+const update = function(id,content,callback) {
+  UserModel.findByIdAndUpdate({id:id},{content},callback)
+}
+const Delete = function(id,callback) {
+  UserModel.findByIdAndRemove({_id:id},callback)
+}
 
 
 let UserModel = mongoose.model('users', UserSchema)
 module.exports.Users = UserModel;
 module.exports.selectAllByByUserName = selectAllByByUserName;
 module.exports.selectOne = selectOne;
+module.exports.selectOneById = selectOneById;
 module.exports.save = save;
 
 

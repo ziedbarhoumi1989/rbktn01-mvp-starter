@@ -36,19 +36,7 @@ class DisplayFriends extends React.Component {
     return <div onClick={this.handleDivClick.bind(this)}></div>
 
 
-    // if (this.state.arr.length > 0) {
-    //   return (<Popup trigger={< button > Trigger</button >} style={{
-    //     position: "right center"
-    //   }}>
-    //     <div>{this.state.arr}</div>
-    //   </Popup >)
-    // } else {
-    //   return (<div><Popup trigger={< button > Trigger</button >} style={{
-    //     position: "right center"
-    //   }}>
-    //     <div>No Such user found</div>
-    //   </Popup ></div>)
-    // }
+
 
   }
 
